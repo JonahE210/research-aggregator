@@ -1,0 +1,29 @@
+services:
+  db:
+    # Phase 2 swaps this to pgvector/pgvector:pg16 to get the vector extension.
+    # Plain postgres is fine for Phase 1 since no embeddings exist yet.
+    image: postgres:16
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raguser -d ragdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Redis gets uncommented in Phase 5 (caching layer). Designing the slot in now.
+  # redis:
+  #   image: redis:7
+  #   ports:
+  #     - "6379:6379"
+
+volumes:
+  pgdata:
